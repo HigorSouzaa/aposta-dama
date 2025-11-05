@@ -1,0 +1,478 @@
+const socket = io();
+
+let currentRoom = null;
+let selectedPiece = null;
+let gameBoard = null;
+let playerColor = null;
+let mustContinueCapture = false;
+let continuingPiece = null;
+
+// Elementos DOM
+const lobbyScreen = document.getElementById('lobby');
+const gameScreen = document.getElementById('game');
+const resultScreen = document.getElementById('result');
+const playerNameInput = document.getElementById('playerName');
+const betAmountInput = document.getElementById('betAmount');
+const createRoomBtn = document.getElementById('createRoomBtn');
+const roomsList = document.getElementById('roomsList');
+const boardElement = document.getElementById('board');
+const currentTurnElement = document.getElementById('currentTurn');
+const gameBetElement = document.getElementById('gameBet');
+const leaveGameBtn = document.getElementById('leaveGameBtn');
+const backToLobbyBtn = document.getElementById('backToLobbyBtn');
+const resultMessage = document.getElementById('resultMessage');
+const prizeMessage = document.getElementById('prizeMessage');
+const balanceElement = document.getElementById('balance');
+
+// Saldo inicial (simulado)
+let balance = 100.00;
+
+// Inicializar saldo quando a página carregar
+document.addEventListener('DOMContentLoaded', () => {
+  updateBalance();
+});
+
+// Atualizar imediatamente também (caso DOMContentLoaded já tenha ocorrido)
+updateBalance();
+
+// Criar sala
+createRoomBtn.addEventListener('click', () => {
+  const playerName = playerNameInput.value.trim();
+  const betAmount = parseFloat(betAmountInput.value);
+  
+  if (!playerName) {
+    alert('Digite seu nome!');
+    return;
+  }
+  
+  if (!betAmount || betAmount <= 0 || betAmount > balance) {
+    alert('Valor de aposta inválido!');
+    return;
+  }
+  
+  socket.emit('createRoom', { playerName, betAmount });
+});
+
+// Socket events
+socket.on('roomCreated', (room) => {
+  currentRoom = room.id;
+  playerColor = 'white';
+  alert('Sala criada! Aguardando outro jogador...');
+});
+
+socket.on('updateRooms', (rooms) => {
+  roomsList.innerHTML = '';
+  
+  rooms.forEach(room => {
+    const roomDiv = document.createElement('div');
+    roomDiv.className = 'room-item';
+    roomDiv.innerHTML = `
+      <div class="room-info">
+        <strong>${room.hostName}</strong><br>
+        Aposta: R$ ${room.betAmount.toFixed(2)}
+      </div>
+      <button onclick="joinRoom('${room.id}')">Entrar</button>
+    `;
+    roomsList.appendChild(roomDiv);
+  });
+});
+
+function joinRoom(roomId) {
+  const playerName = playerNameInput.value.trim();
+  
+  if (!playerName) {
+    alert('Digite seu nome!');
+    return;
+  }
+  
+  currentRoom = roomId;
+  playerColor = 'black';
+  socket.emit('joinRoom', roomId);
+}
+
+socket.on('gameStart', (game) => {
+  gameBoard = game.board;
+  gameBetElement.textContent = (game.betAmount * 2).toFixed(2);
+  
+  // Ativar áudio context com interação do usuário
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+  
+  playSound('move');
+  showScreen('game');
+  renderBoard();
+});
+
+socket.on('moveMade', (data) => {
+  gameBoard = data.board;
+  currentTurnElement.textContent = data.currentTurn === 'white' ? 'Brancas' : 'Pretas';
+  
+  // Verificar se deve continuar capturando
+  mustContinueCapture = data.mustContinue || false;
+  continuingPiece = data.continuingPiece || null;
+  
+  if (mustContinueCapture && continuingPiece) {
+    // Auto-selecionar a peça que deve continuar capturando
+    selectedPiece = continuingPiece;
+    playSound('capture');
+    showNotification('🎯 Continue capturando! Clique onde quer mover.');
+  } else {
+    selectedPiece = null;
+    mustContinueCapture = false;
+    continuingPiece = null;
+    
+    // Tocar som de captura ou movimento
+    if (data.wasCapture) {
+      playSound('capture');
+    } else {
+      playSound('move');
+    }
+  }
+  
+  renderBoard();
+});
+
+socket.on('invalidMove', (data) => {
+  playSound('error');
+  showNotification('❌ ' + data.message);
+  selectedPiece = null;
+  renderBoard();
+});
+
+socket.on('gameEnd', (data) => {
+  const won = data.winner === playerColor;
+  
+  if (won) {
+    balance += data.prize;
+    resultMessage.textContent = '🎉 Você Venceu!';
+    prizeMessage.textContent = `Você ganhou R$ ${data.prize.toFixed(2)}`;
+    playSound('win');
+  } else {
+    balance -= data.prize / 2;
+    resultMessage.textContent = '😔 Você Perdeu';
+    prizeMessage.textContent = `Você perdeu R$ ${(data.prize / 2).toFixed(2)}`;
+    playSound('lose');
+  }
+  
+  updateBalance();
+  showScreen('result');
+});
+
+// Renderizar tabuleiro
+function renderBoard() {
+  boardElement.innerHTML = '';
+  
+  // Calcular movimentos válidos APENAS se:
+  // 1. Houver peça selecionada
+  // 2. A peça for do jogador atual
+  // 3. For o turno do jogador
+  let validMoves = [];
+  let mustShowCaptures = false;
+  
+  if (selectedPiece && playerColor === gameBoard[selectedPiece.row]?.[selectedPiece.col]?.color) {
+    validMoves = getValidMovesForPiece(selectedPiece);
+    
+    // Verificar se há capturas obrigatórias disponíveis no tabuleiro
+    const allCaptures = getAllCapturesForPlayer();
+    mustShowCaptures = allCaptures.length > 0;
+  }
+  
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const cell = document.createElement('div');
+      cell.className = `cell ${(row + col) % 2 === 0 ? 'white' : 'black'}`;
+      cell.dataset.row = row;
+      cell.dataset.col = col;
+      
+      // Destacar célula selecionada
+      if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+        cell.classList.add('selected');
+      }
+      
+      // Destacar movimentos válidos APENAS da peça selecionada
+      const isValidMove = validMoves.some(move => move.row === row && move.col === col);
+      if (isValidMove && selectedPiece) {
+        const move = validMoves.find(m => m.row === row && m.col === col);
+        
+        // Se há capturas obrigatórias, só mostrar capturas
+        if (!mustShowCaptures || move.isCapture) {
+          cell.classList.add('valid-move');
+          
+          // Adicionar indicador visual de movimento possível
+          const indicator = document.createElement('div');
+          indicator.className = 'move-indicator';
+          cell.appendChild(indicator);
+        }
+      }
+      
+      const piece = gameBoard[row][col];
+      if (piece) {
+        const pieceElement = document.createElement('div');
+        pieceElement.className = `piece ${piece.color}-piece ${piece.isKing ? 'king' : ''}`;
+        cell.appendChild(pieceElement);
+      }
+      
+      cell.addEventListener('click', () => handleCellClick(row, col));
+      boardElement.appendChild(cell);
+    }
+  }
+}
+
+// Obter todas as capturas disponíveis para o jogador atual
+function getAllCapturesForPlayer() {
+  const captures = [];
+  
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = gameBoard[row][col];
+      if (piece && piece.color === playerColor) {
+        const pieceMoves = getValidMovesForPiece({ row, col });
+        const pieceCaptures = pieceMoves.filter(m => m.isCapture);
+        captures.push(...pieceCaptures);
+      }
+    }
+  }
+  
+  return captures;
+}
+
+// Calcular movimentos válidos para uma peça
+function getValidMovesForPiece(position) {
+  const validMoves = [];
+  const piece = gameBoard[position.row][position.col];
+  if (!piece) return validMoves;
+  
+  // Direções diagonais
+  const directions = [
+    { row: -1, col: -1 },
+    { row: -1, col: 1 },
+    { row: 1, col: -1 },
+    { row: 1, col: 1 }
+  ];
+  
+  for (const dir of directions) {
+    // Peça normal - 1 ou 2 casas
+    if (!piece.isKing) {
+      // Movimento simples (1 casa)
+      const moveRow = position.row + dir.row;
+      const moveCol = position.col + dir.col;
+      
+      if (moveRow >= 0 && moveRow < 8 && moveCol >= 0 && moveCol < 8) {
+        if (!gameBoard[moveRow][moveCol]) {
+          // Verificar se é movimento válido (direção correta)
+          if ((piece.color === 'white' && dir.row < 0) || 
+              (piece.color === 'black' && dir.row > 0)) {
+            validMoves.push({ row: moveRow, col: moveCol, isCapture: false });
+          }
+        }
+      }
+      
+      // Captura (2 casas) - pode ser para trás
+      const jumpRow = position.row + (dir.row * 2);
+      const jumpCol = position.col + (dir.col * 2);
+      const midRow = position.row + dir.row;
+      const midCol = position.col + dir.col;
+      
+      if (jumpRow >= 0 && jumpRow < 8 && jumpCol >= 0 && jumpCol < 8) {
+        const midPiece = gameBoard[midRow][midCol];
+        const destPiece = gameBoard[jumpRow][jumpCol];
+        
+        if (midPiece && midPiece.color !== piece.color && !destPiece) {
+          validMoves.push({ row: jumpRow, col: jumpCol, isCapture: true });
+        }
+      }
+    } else {
+      // Dama - múltiplas casas
+      for (let dist = 1; dist < 8; dist++) {
+        const moveRow = position.row + (dir.row * dist);
+        const moveCol = position.col + (dir.col * dist);
+        
+        if (moveRow < 0 || moveRow >= 8 || moveCol < 0 || moveCol >= 8) break;
+        
+        const destPiece = gameBoard[moveRow][moveCol];
+        
+        // Movimento simples
+        if (!destPiece) {
+          validMoves.push({ row: moveRow, col: moveCol, isCapture: false });
+        } else if (destPiece.color !== piece.color) {
+          // Possível captura - verificar se há espaço depois
+          for (let jumpDist = dist + 1; jumpDist < 8; jumpDist++) {
+            const jumpRow = position.row + (dir.row * jumpDist);
+            const jumpCol = position.col + (dir.col * jumpDist);
+            
+            if (jumpRow < 0 || jumpRow >= 8 || jumpCol < 0 || jumpCol >= 8) break;
+            
+            const jumpDestPiece = gameBoard[jumpRow][jumpCol];
+            if (!jumpDestPiece) {
+              validMoves.push({ row: jumpRow, col: jumpCol, isCapture: true });
+            } else {
+              break;
+            }
+          }
+          break;
+        } else {
+          break;
+        }
+      }
+    }
+  }
+  
+  return validMoves;
+}
+
+function handleCellClick(row, col) {
+  const piece = gameBoard[row][col];
+  
+  // Se deve continuar capturando, só pode selecionar a peça específica
+  if (mustContinueCapture && continuingPiece) {
+    if (!selectedPiece) {
+      // Só permite selecionar a peça que deve continuar
+      if (row === continuingPiece.row && col === continuingPiece.col) {
+        selectedPiece = { row, col };
+        playSound('select');
+        renderBoard();
+      } else {
+        playSound('error');
+        showNotification('⚠️ Você deve continuar capturando com a mesma peça!');
+      }
+      return;
+    }
+  }
+  
+  if (selectedPiece) {
+    // Se clicar na mesma peça, desselecionar
+    if (selectedPiece.row === row && selectedPiece.col === col) {
+      selectedPiece = null;
+      renderBoard();
+      return;
+    }
+    
+    // Se clicar em outra peça sua, trocar seleção
+    if (piece && piece.color === playerColor) {
+      selectedPiece = { row, col };
+      playSound('select');
+      renderBoard();
+      return;
+    }
+    
+    // Tentar mover
+    socket.emit('movePiece', {
+      roomId: currentRoom,
+      move: {
+        from: selectedPiece,
+        to: { row, col }
+      }
+    });
+    // Não limpar selectedPiece aqui, esperar resposta do servidor
+  } else if (piece && piece.color === playerColor) {
+    // Selecionar peça
+    selectedPiece = { row, col };
+    playSound('select');
+    renderBoard();
+  }
+}
+
+// Navegação
+function showScreen(screenName) {
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.classList.remove('active');
+  });
+  document.getElementById(screenName).classList.add('active');
+}
+
+leaveGameBtn.addEventListener('click', () => {
+  if (confirm('Deseja realmente sair? Você perderá a aposta!')) {
+    socket.disconnect();
+    socket.connect();
+    showScreen('lobby');
+  }
+});
+
+backToLobbyBtn.addEventListener('click', () => {
+  showScreen('lobby');
+});
+
+function updateBalance() {
+  if (balanceElement) {
+    balanceElement.textContent = balance.toFixed(2);
+    console.log('💰 Saldo atualizado: R$', balance.toFixed(2));
+  }
+}
+
+// Sistema de Sons com Web Audio API
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+function createSound(frequency, duration, type = 'sine') {
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.frequency.value = frequency;
+  oscillator.type = type;
+  
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+  
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+}
+
+function playSound(soundName) {
+  try {
+    // Garantir que o AudioContext está rodando
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+    
+    switch(soundName) {
+      case 'select':
+        createSound(400, 0.1, 'sine');
+        break;
+      case 'move':
+        createSound(300, 0.15, 'sine');
+        setTimeout(() => createSound(350, 0.1, 'sine'), 50);
+        break;
+      case 'capture':
+        createSound(500, 0.1, 'square');
+        setTimeout(() => createSound(250, 0.15, 'square'), 80);
+        break;
+      case 'error':
+        createSound(200, 0.2, 'sawtooth');
+        break;
+      case 'win':
+        createSound(523, 0.15, 'sine'); // C
+        setTimeout(() => createSound(659, 0.15, 'sine'), 150); // E
+        setTimeout(() => createSound(784, 0.3, 'sine'), 300); // G
+        break;
+      case 'lose':
+        createSound(400, 0.2, 'sine');
+        setTimeout(() => createSound(300, 0.3, 'sine'), 200);
+        break;
+    }
+  } catch (error) {
+    console.log('Erro ao tocar som:', error);
+  }
+}
+
+// Sistema de Notificações
+function showNotification(message) {
+  // Remover notificação anterior se existir
+  const oldNotification = document.querySelector('.game-notification');
+  if (oldNotification) {
+    oldNotification.remove();
+  }
+  
+  const notification = document.createElement('div');
+  notification.className = 'game-notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  
+  // Remover após 3 segundos
+  setTimeout(() => {
+    notification.classList.add('fade-out');
+    setTimeout(() => notification.remove(), 500);
+  }, 3000);
+}
