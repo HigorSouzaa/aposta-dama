@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Damas Online - Apostas P2P</title>
+  <link rel="stylesheet" href="../css/game.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎲 Damas Apostas</h1>
+      <div class="wallet">
+        Saldo: R$ <span id="balance">100.00</span>
+      </div>
+    </header>
+
+    <!-- Lobby -->
+    <div id="lobby" class="screen active">
+      <div class="player-info">
+        <input type="text" id="playerName" placeholder="Seu nome" />
+      </div>
+      
+      <div class="actions">
+        <div class="create-room">
+          <h3>Criar Sala</h3>
+          <input type="number" id="betAmount" placeholder="Valor da aposta (R$)" min="1" />
+          <button id="createRoomBtn">Criar Sala</button>
+        </div>
+        
+        <div class="rooms-list">
+          <h3>Salas Disponíveis</h3>
+          <div id="roomsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jogo -->
+    <div id="game" class="screen">
+      <div class="game-info">
+        <div class="player-turn">
+          Turno: <span id="currentTurn">Brancas</span>
+        </div>
+        <div class="bet-info">
+          Aposta: R$ <span id="gameBet">0.00</span>
+        </div>
+      </div>
+      
+      <div id="board" class="board"></div>
+      
+      <button id="leaveGameBtn" class="btn-danger">Sair do Jogo</button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="result" class="screen">
+      <div class="result-card">
+        <h2 id="resultMessage"></h2>
+        <p id="prizeMessage"></p>
+        <button id="backToLobbyBtn">Voltar ao Lobby</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../js/game.js"></script>
+</body>
+</html>

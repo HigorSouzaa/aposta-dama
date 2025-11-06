@@ -1,67 +1,238 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Damas Online - Apostas P2P</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>🎲 Damas Apostas</h1>
-      <div class="wallet">
-        Saldo: R$ <span id="balance">100.00</span>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Damas Online - Aposte e Jogue Agora</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <link href="css/index.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="content-wrapper">
+        <header>
+          <div class="header-logo">
+            <div class="logo-icon">
+              <svg
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M22.04 7.42C22.04 8.79 19.96 10 17 10.57C19.96 11.14 22.04 12.35 22.04 13.71C22.04 15.08 19.96 16.29 17 16.86C19.96 17.43 22.04 18.64 22.04 20C22.04 22.21 17.52 24 12 24C6.48 24 1.96 22.21 1.96 20C1.96 18.64 4.04 17.43 7 16.86C4.04 16.29 1.96 15.08 1.96 13.71C1.96 12.35 4.04 11.14 7 10.57C4.04 10 1.96 8.79 1.96 7.42C1.96 5.21 6.48 3.42 12 3.42C17.52 3.42 22.04 5.21 22.04 7.42Z"
+                ></path>
+              </svg>
+            </div>
+            <h2 class="logo-title">🎲 Damas Apostas</h2>
+          </div>
+          <nav class="header-nav">
+            <a class="nav-link" href="#jogar">Jogar Agora</a>
+            <a class="nav-link" href="#como-funciona">Como Funciona</a>
+            <a class="nav-link" href="#lobbies">Lobbies</a>
+          </nav>
+          <div class="header-buttons">
+            <button onclick="redirectToLogin()" class="btn btn-secondary">
+              <span class="truncate">Login</span>
+            </button>
+            <button onclick="redirectToRegister()" class="btn btn-primary">
+              <span class="truncate">Registrar</span>
+            </button>
+          </div>
+        </header>
+        <main class="container">
+          <section id="hero" class="hero-section">
+            <div class="hero-container">
+              <div class="hero-banner">
+                <div class="hero-content">
+                  <h1 class="hero-title">
+                    Sua Jogada de Mestre Vale Dinheiro. Aposte em Damas Online.
+                  </h1>
+                  <h2 class="hero-subtitle">
+                    Desafie jogadores, faça suas apostas e vença em partidas
+                    emocionantes. Junte-se à nossa comunidade agora.
+                  </h2>
+                </div>
+                <button
+                  onclick="redirectToGame()"
+                  class="btn btn-primary hero-button"
+                >
+                  <span class="truncate">Aposte e Jogue Agora</span>
+                </button>
+              </div>
+            </div>
+          </section>
+          <section id="features" class="features-section">
+            <div class="section-header">
+              <h2 class="section-title">Por que jogar conosco?</h2>
+              <p class="section-description">
+                Oferecemos uma plataforma segura e emocionante para você testar
+                suas habilidades e sorte.
+              </p>
+            </div>
+            <div class="features-grid">
+              <div class="feature-card">
+                <span class="material-symbols-outlined feature-icon"
+                  >shield_lock</span
+                >
+                <div class="feature-content">
+                  <h3 class="feature-title">Apostas Seguras</h3>
+                  <p class="feature-description">
+                    Suas transações são protegidas com a mais alta tecnologia de
+                    segurança.
+                  </p>
+                </div>
+              </div>
+              <div class="feature-card">
+                <span class="material-symbols-outlined feature-icon"
+                  >timer</span
+                >
+                <div class="feature-content">
+                  <h3 class="feature-title">Partidas Rápidas</h3>
+                  <p class="feature-description">
+                    Encontre oponentes do seu nível e comece a jogar em
+                    segundos.
+                  </p>
+                </div>
+              </div>
+              <div class="feature-card">
+                <span class="material-symbols-outlined feature-icon"
+                  >groups</span
+                >
+                <div class="feature-content">
+                  <h3 class="feature-title">Comunidade Ativa</h3>
+                  <p class="feature-description">
+                    Conecte-se com outros jogadores, participe de torneios e
+                    suba no ranking.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="como-funciona" class="how-it-works-section">
+            <div class="section-header">
+              <h2 class="section-title">Como Funciona</h2>
+            </div>
+            <div class="timeline-container">
+              <div class="timeline-grid">
+                <div class="timeline-icon-column">
+                  <div class="timeline-icon">
+                    <span class="material-symbols-outlined">person_add</span>
+                  </div>
+                  <div class="timeline-line"></div>
+                </div>
+                <div class="timeline-content">
+                  <p class="timeline-title">1. Registre-se</p>
+                  <p class="timeline-description">
+                    Crie sua conta gratuita em menos de um minuto.
+                  </p>
+                </div>
+                <div class="timeline-icon-column">
+                  <div class="timeline-connector"></div>
+                  <div class="timeline-icon">
+                    <span class="material-symbols-outlined"
+                      >account_balance_wallet</span
+                    >
+                  </div>
+                  <div class="timeline-line"></div>
+                </div>
+                <div class="timeline-content">
+                  <p class="timeline-title">2. Deposite</p>
+                  <p class="timeline-description">
+                    Adicione fundos à sua carteira de forma rápida e segura.
+                  </p>
+                </div>
+                <div class="timeline-icon-column">
+                  <div class="timeline-connector"></div>
+                  <div class="timeline-icon">
+                    <span class="material-symbols-outlined">casino</span>
+                  </div>
+                </div>
+                <div class="timeline-content">
+                  <p class="timeline-title">3. Desafie e Jogue</p>
+                  <p class="timeline-description">
+                    Encontre um oponente, defina sua aposta e comece a partida.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="lobbies" class="lobbies-section">
+            <div class="section-header">
+              <h2 class="section-title">Lobbies Ativos</h2>
+            </div>
+            <div class="lobbies-grid">
+              <div class="lobby-card">
+                <div class="lobby-header">
+                  <h3 class="lobby-title">Mesa Casual</h3>
+                  <span class="lobby-badge badge-green">2/2 Jogadores</span>
+                </div>
+                <div class="lobby-info">
+                  <span class="lobby-label">Aposta</span>
+                  <span class="lobby-value">R$ 5,00</span>
+                </div>
+                <button class="btn btn-primary lobby-button btn-watch">
+                  Observar
+                </button>
+              </div>
+              <div class="lobby-card">
+                <div class="lobby-header">
+                  <h3 class="lobby-title">Mesa Rápida</h3>
+                  <span class="lobby-badge badge-blue">1/2 Jogadores</span>
+                </div>
+                <div class="lobby-info">
+                  <span class="lobby-label">Aposta</span>
+                  <span class="lobby-value">R$ 10,00</span>
+                </div>
+                <button
+                  onclick="redirectToGame()"
+                  class="btn btn-primary lobby-button"
+                >
+                  Entrar
+                </button>
+              </div>
+              <div class="lobby-card">
+                <div class="lobby-header">
+                  <h3 class="lobby-title">Torneio Semanal</h3>
+                  <span class="lobby-badge badge-yellow">15/32 Jogadores</span>
+                </div>
+                <div class="lobby-info">
+                  <span class="lobby-label">Prêmio</span>
+                  <span class="lobby-value">R$ 1.000,00</span>
+                </div>
+                <button class="btn btn-primary lobby-button btn-disabled">
+                  Em Breve
+                </button>
+              </div>
+            </div>
+          </section>
+        </main>
       </div>
-    </header>
-
-    <!-- Lobby -->
-    <div id="lobby" class="screen active">
-      <div class="player-info">
-        <input type="text" id="playerName" placeholder="Seu nome" />
-      </div>
-      
-      <div class="actions">
-        <div class="create-room">
-          <h3>Criar Sala</h3>
-          <input type="number" id="betAmount" placeholder="Valor da aposta (R$)" min="1" />
-          <button id="createRoomBtn">Criar Sala</button>
+      <footer>
+        <div class="container footer-content">
+          <div class="footer-inner">
+            <p class="footer-copyright">
+              © 2024 Damas Online. Todos os direitos reservados.
+            </p>
+            <div class="footer-links">
+              <a class="footer-link" href="#termos">Termos de Serviço</a>
+              <a class="footer-link" href="#privacidade"
+                >Política de Privacidade</a
+              >
+              <a class="footer-link" href="#responsavel">Jogo Responsável</a>
+            </div>
+          </div>
         </div>
-        
-        <div class="rooms-list">
-          <h3>Salas Disponíveis</h3>
-          <div id="roomsList"></div>
-        </div>
-      </div>
+      </footer>
     </div>
-
-    <!-- Jogo -->
-    <div id="game" class="screen">
-      <div class="game-info">
-        <div class="player-turn">
-          Turno: <span id="currentTurn">Brancas</span>
-        </div>
-        <div class="bet-info">
-          Aposta: R$ <span id="gameBet">0.00</span>
-        </div>
-      </div>
-      
-      <div id="board" class="board"></div>
-      
-      <button id="leaveGameBtn" class="btn-danger">Sair do Jogo</button>
-    </div>
-
-    <!-- Resultado -->
-    <div id="result" class="screen">
-      <div class="result-card">
-        <h2 id="resultMessage"></h2>
-        <p id="prizeMessage"></p>
-        <button id="backToLobbyBtn">Voltar ao Lobby</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="game.js"></script>
-</body>
+    <script src="js/home.js"></script>
+  </body>
 </html>

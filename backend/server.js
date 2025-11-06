@@ -20,6 +20,16 @@ app.use(express.json());
 const path = require('path');
 app.use(express.static(path.join(__dirname, '../frontend')));
 
+// Rota para a página inicial (Landing Page)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
+// Rota para o jogo
+app.get('/jogo', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/game.html'));
+});
+
 // Conexão MongoDB
 mongoose.connect('mongodb+srv://higorhenry102:Senac2004@api.1hr0gpv.mongodb.net/bcd_dama?retryWrites=true&w=majority&appName=API')
   .then(() => console.log('✅ MongoDB conectado com sucesso'))
