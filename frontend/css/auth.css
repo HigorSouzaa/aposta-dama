@@ -1,0 +1,450 @@
+/* CSS para páginas de autenticação (Login e Registro) */
+
+/* Variáveis */
+:root {
+  --primary: #667eea;
+  --background-dark: #101622;
+  --card-dark: #1a1f2e;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--background-dark);
+  color: var(--gray-200);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Layout principal */
+.auth-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Lado esquerdo - Branding */
+.auth-left {
+  flex: 1;
+  background: linear-gradient(135deg, rgba(16, 22, 34, 0.95) 0%, rgba(26, 31, 46, 0.95) 100%),
+              url("data:image/svg+xml,%3Csvg width='800' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='checkerboard' x='0' y='0' width='80' height='80' patternUnits='userSpaceOnUse'%3E%3Crect x='0' y='0' width='40' height='40' fill='%23b58863'/%3E%3Crect x='40' y='0' width='40' height='40' fill='%23f0d9b5'/%3E%3Crect x='0' y='40' width='40' height='40' fill='%23f0d9b5'/%3E%3Crect x='40' y='40' width='40' height='40' fill='%23b58863'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='800' height='600' fill='url(%23checkerboard)' opacity='0.1'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.auth-logo-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--primary);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.auth-logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.auth-branding {
+  max-width: 560px;
+}
+
+.auth-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 1.5rem;
+}
+
+.auth-subtitle {
+  font-size: 1.125rem;
+  color: var(--gray-300);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.auth-footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.auth-footer-link {
+  color: var(--gray-400);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.3s;
+}
+
+.auth-footer-link:hover {
+  color: var(--white);
+}
+
+/* Lado direito - Formulário */
+.auth-right {
+  flex: 1;
+  background-color: var(--background-dark);
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-form-container {
+  width: 100%;
+  max-width: 450px;
+}
+
+.auth-form-header {
+  margin-bottom: 1.5rem;
+}
+
+.auth-form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+
+.auth-form-description {
+  color: var(--gray-400);
+  font-size: 0.875rem;
+}
+
+/* Tabs (Login/Registrar) */
+.auth-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background-color: var(--card-dark);
+  padding: 0.25rem;
+  border-radius: 0.5rem;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--gray-400);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: all 0.3s;
+}
+
+.auth-tab.active {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.auth-tab:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--gray-300);
+}
+
+/* Formulário */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Grid para formulário de registro */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-grid .form-group {
+  margin-bottom: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0;
+}
+
+.form-label {
+  color: var(--gray-300);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-input-wrapper {
+  position: relative;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--card-dark);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: var(--white);
+  font-size: 0.875rem;
+  transition: all 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: rgba(26, 31, 46, 0.8);
+}
+
+.form-input::placeholder {
+  color: var(--gray-600);
+}
+
+.form-input-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.form-input-icon:hover {
+  color: var(--gray-300);
+}
+
+.form-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: opacity 0.3s;
+}
+
+.form-link:hover {
+  opacity: 0.8;
+}
+
+.form-forgot {
+  text-align: right;
+  margin-top: -0.5rem;
+}
+
+/* Botões */
+.btn-auth {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: rgba(102, 126, 234, 0.9);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+/* Separador */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.auth-divider-text {
+  color: var(--gray-400);
+  font-size: 0.875rem;
+}
+
+/* Botões sociais */
+.social-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background-color: var(--card-dark);
+  color: var(--gray-300);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-social:hover {
+  border-color: var(--primary);
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+.btn-social img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 968px) {
+  .auth-wrapper {
+    flex-direction: column;
+  }
+
+  .auth-left {
+    min-height: 30vh;
+    padding: 2rem;
+  }
+
+  .auth-title {
+    font-size: 2rem;
+  }
+
+  .auth-right {
+    padding: 2rem;
+  }
+
+  .auth-footer-links {
+    display: none;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-left {
+    padding: 1.5rem;
+  }
+
+  .auth-right {
+    padding: 1.5rem;
+  }
+
+  .auth-title {
+    font-size: 1.75rem;
+  }
+
+  .social-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-form-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-form-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Estados de erro */
+.form-input.error {
+  border-color: #ef4444;
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Loading state */
+.btn-auth:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-loading {
+  position: relative;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

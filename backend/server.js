@@ -30,6 +30,16 @@ app.get('/jogo', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/pages/game.html'));
 });
 
+// Rota para login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/login.html'));
+});
+
+// Rota para registro
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/register.html'));
+});
+
 // Conexão MongoDB
 mongoose.connect('mongodb+srv://higorhenry102:Senac2004@api.1hr0gpv.mongodb.net/bcd_dama?retryWrites=true&w=majority&appName=API')
   .then(() => console.log('✅ MongoDB conectado com sucesso'))

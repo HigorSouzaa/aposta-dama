@@ -6,15 +6,11 @@ function redirectToGame() {
 }
 
 function redirectToLogin() {
-  // Por enquanto redireciona para o jogo
-  // Mais tarde pode criar página de login separada
-  window.location.href = '/jogo';
+  window.location.href = '/login';
 }
 
 function redirectToRegister() {
-  // Por enquanto redireciona para o jogo
-  // Mais tarde pode criar página de registro separada
-  window.location.href = '/jogo';
+  window.location.href = '/register';
 }
 
 // Smooth scroll para seções
