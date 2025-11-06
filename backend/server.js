@@ -986,12 +986,16 @@ io.on('connection', (socket) => {
   });
 
   // Entrar em sala
-  socket.on('joinRoom', (roomId) => {
+  socket.on('joinRoom', (data) => {
+    const roomId = typeof data === 'string' ? data : data.roomId;
+    const playerName = typeof data === 'string' ? 'Jogador' : (data.playerName || 'Jogador');
+    
     const room = waitingRooms.find(r => r.id === roomId);
     
     if (room && room.status === 'waiting') {
       socket.join(roomId);
       room.guest = socket.id;
+      room.guestName = playerName;
       room.status = 'playing';
       
       // Inicializar jogo

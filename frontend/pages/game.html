@@ -121,8 +121,11 @@
         
         <div class="create-room-form">
           <div class="form-group">
-            <label for="playerName">Seu Nome</label>
-            <input type="text" id="playerName" placeholder="Digite seu nome de jogador" />
+            <label for="playerName">Seu Nome <span style="color: #f5576c;">*</span></label>
+            <input type="text" id="playerName" placeholder="Digite seu nome (ex: Jogador123)" required />
+            <small style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+              Digite um nome para entrar no jogo
+            </small>
           </div>
           
           <div class="form-group">
@@ -172,8 +175,11 @@
               <label for="betAmount">Valor da Aposta</label>
               <div class="input-with-icon">
                 <span class="input-icon">R$</span>
-                <input type="number" id="betAmount" placeholder="50.00" min="1" step="0.01" />
+                <input type="number" id="betAmount" placeholder="10.00" value="10" min="1" step="0.01" />
               </div>
+              <small style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.25rem; display: block;">
+                Valor padrão: R$ 10,00
+              </small>
             </div>
             
             <div class="form-group">
@@ -343,6 +349,27 @@
         <h2 id="resultMessage"></h2>
         <p id="prizeMessage"></p>
         <button id="backToLobbyBtn" class="btn-primary">Voltar ao Lobby</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para entrar em sala -->
+  <div id="joinRoomModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Entrar na Sala</h3>
+        <button class="modal-close" onclick="closeJoinModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="joinPlayerName">Digite seu nome para entrar:</label>
+          <input type="text" id="joinPlayerName" placeholder="Ex: Jogador123" autofocus />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeJoinModal()">Cancelar</button>
+        <button class="btn-primary" onclick="confirmJoinRoom()">Entrar</button>
       </div>
     </div>
   </div>

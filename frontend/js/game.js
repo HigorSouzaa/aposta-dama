@@ -128,16 +128,23 @@ timeLimitSelect?.addEventListener('change', (e) => {
 
 // Criar sala (confirmação)
 confirmCreateRoomBtn?.addEventListener('click', () => {
-  const playerName = playerNameInput.value.trim();
-  const betAmount = parseFloat(betAmountInput.value);
+  let playerName = playerNameInput.value.trim();
+  const betAmount = parseFloat(betAmountInput.value) || 10; // Valor padrão 10
   
+  // Se não digitou nome, gerar um aleatório
   if (!playerName) {
-    alert('Digite seu nome!');
+    playerName = `Jogador${Math.floor(Math.random() * 10000)}`;
+    playerNameInput.value = playerName;
+  }
+  
+  // Validar aposta
+  if (betAmount <= 0) {
+    alert('Valor de aposta deve ser maior que zero!');
     return;
   }
   
-  if (!betAmount || betAmount <= 0 || betAmount > balance) {
-    alert('Valor de aposta inválido!');
+  if (betAmount > balance) {
+    alert(`Saldo insuficiente! Você tem apenas R$ ${balance.toFixed(2)}`);
     return;
   }
   
@@ -214,18 +221,65 @@ function formatTime(seconds) {
   return `${seconds / 3600} h`;
 }
 
+// Variável para guardar o ID da sala temporariamente
+let pendingRoomId = null;
+
+// Função para abrir modal de entrada
 function joinRoom(roomId) {
-  const playerName = playerNameInput.value.trim();
+  pendingRoomId = roomId;
+  const modal = document.getElementById('joinRoomModal');
+  const input = document.getElementById('joinPlayerName');
   
+  // Gerar nome aleatório como sugestão
+  const randomName = `Jogador${Math.floor(Math.random() * 10000)}`;
+  input.value = randomName;
+  input.placeholder = randomName;
+  
+  modal.style.display = 'flex';
+  
+  // Focar no input após um pequeno delay
+  setTimeout(() => {
+    input.focus();
+    input.select();
+  }, 100);
+}
+
+// Função para fechar modal
+function closeJoinModal() {
+  const modal = document.getElementById('joinRoomModal');
+  modal.style.display = 'none';
+  pendingRoomId = null;
+}
+
+// Função para confirmar entrada na sala
+function confirmJoinRoom() {
+  const input = document.getElementById('joinPlayerName');
+  let playerName = input.value.trim();
+  
+  // Se não digitou, usar nome aleatório
   if (!playerName) {
-    alert('Digite seu nome!');
-    return;
+    playerName = `Jogador${Math.floor(Math.random() * 10000)}`;
   }
   
-  currentRoom = roomId;
-  playerColor = 'black';
-  socket.emit('joinRoom', roomId);
+  if (pendingRoomId) {
+    currentRoom = pendingRoomId;
+    playerColor = 'black';
+    socket.emit('joinRoom', { roomId: pendingRoomId, playerName: playerName });
+    closeJoinModal();
+  }
 }
+
+// Permitir Enter para confirmar
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('joinPlayerName');
+  if (input) {
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        confirmJoinRoom();
+      }
+    });
+  }
+});
 
 socket.on('gameStart', (game) => {
   gameBoard = game.board;
