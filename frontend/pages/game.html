@@ -19,10 +19,10 @@
       </a>
       
       <nav class="nav-menu">
-        <a href="/" class="nav-link">Início</a>
-        <a href="/#features" class="nav-link">Torneios</a>
-        <a href="/#lobbies" class="nav-link">Ranking</a>
-        <a href="/jogo" class="nav-link active">Loja</a>
+        <a href="/jogo" class="nav-link">Início</a>
+        <a href="/jogo" class="nav-link active">Torneios</a>
+        <a href="/jogo" class="nav-link">Ranking</a>
+        <a href="/jogo" class="nav-link">Loja</a>
       </nav>
       
       <div class="header-actions">
@@ -45,24 +45,167 @@
   <!-- Lobby -->
   <div id="lobby" class="screen active">
     <div class="lobby-container">
-      <div class="player-info-lobby">
-        <h2>Bem-vindo!</h2>
-        <input type="text" id="playerName" placeholder="Digite seu nome" />
+      <div class="lobby-header">
+        <h1 class="lobby-title">Lobby de Jogos</h1>
+        <p class="lobby-subtitle">Encontre uma mesa para jogar ou crie a sua.</p>
       </div>
       
-      <div class="lobby-content">
-        <div class="create-room-section">
-          <h3>Criar Nova Sala</h3>
-          <div class="input-group">
-            <label>Valor da Aposta</label>
-            <input type="number" id="betAmount" placeholder="R$ 0,00" min="1" />
-          </div>
-          <button id="createRoomBtn" class="btn-primary">Criar Sala</button>
+      <div class="lobby-tabs">
+        <button class="lobby-tab active">Competitivo</button>
+        <button class="lobby-tab">Casual</button>
+      </div>
+      
+      <div class="lobby-filters">
+        <button class="filter-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+        </button>
+        <button class="filter-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+        </button>
+        <button id="createRoomBtn" class="btn-create-room">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Criar Nova Mesa
+        </button>
+      </div>
+      
+      <div class="rooms-table">
+        <div class="rooms-table-header">
+          <div class="th">NOME/MESA</div>
+          <div class="th">APOSTA</div>
+          <div class="th">JOGADORES</div>
+          <div class="th">TEMPO</div>
+          <div class="th">AÇÃO</div>
+        </div>
+        <div id="roomsList" class="rooms-table-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Criar Sala -->
+  <div id="createRoom" class="screen">
+    <div class="create-room-container">
+      <button id="backToLobbyFromCreate" class="btn-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Voltar ao Lobby
+      </button>
+      
+      <div class="create-room-card">
+        <div class="create-room-header">
+          <div class="room-icon">🎮</div>
+          <h2>Criar Nova Sala</h2>
+          <p>Configure os detalhes da sua partida</p>
         </div>
         
-        <div class="rooms-list-section">
-          <h3>Salas Disponíveis</h3>
-          <div id="roomsList" class="rooms-grid"></div>
+        <div class="create-room-form">
+          <div class="form-group">
+            <label for="playerName">Seu Nome</label>
+            <input type="text" id="playerName" placeholder="Digite seu nome de jogador" />
+          </div>
+          
+          <div class="form-group">
+            <label for="roomName">Nome da Sala</label>
+            <input type="text" id="roomName" placeholder="Ex: Mesa do Campeão" />
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="betAmount">Valor da Aposta</label>
+              <div class="input-with-icon">
+                <span class="input-icon">R$</span>
+                <input type="number" id="betAmount" placeholder="50.00" min="1" step="0.01" />
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="gameMode">Modo de Jogo</label>
+              <select id="gameMode">
+                <option value="competitive">Competitivo</option>
+                <option value="casual">Casual</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="timeLimit">Tempo por Turno</label>
+              <select id="timeLimit">
+                <option value="30">30 segundos</option>
+                <option value="60">1 minuto</option>
+                <option value="120">2 minutos</option>
+                <option value="300" selected>5 minutos</option>
+                <option value="600">10 minutos</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="roomPrivacy">Privacidade</label>
+              <select id="roomPrivacy">
+                <option value="public">Pública</option>
+                <option value="private">Privada</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="allowSpectators" checked />
+              <span>Permitir espectadores</span>
+            </label>
+          </div>
+          
+          <button id="confirmCreateRoomBtn" class="btn-create-confirm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Criar Sala e Aguardar
+          </button>
+        </div>
+        
+        <div class="create-room-preview">
+          <h4>Prévia da Sala</h4>
+          <div class="room-preview-card">
+            <div class="room-preview-header">
+              <span class="room-preview-name" id="previewRoomName">Mesa do Campeão</span>
+              <span class="room-preview-mode" id="previewMode">Competitivo</span>
+            </div>
+            <div class="room-preview-details">
+              <div class="preview-detail">
+                <span class="detail-label">Aposta:</span>
+                <span class="detail-value" id="previewBet">R$ 50,00</span>
+              </div>
+              <div class="preview-detail">
+                <span class="detail-label">Jogadores:</span>
+                <span class="detail-value">1/2</span>
+              </div>
+              <div class="preview-detail">
+                <span class="detail-label">Tempo:</span>
+                <span class="detail-value" id="previewTime">5 min</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

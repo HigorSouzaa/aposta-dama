@@ -10,11 +10,19 @@ let continuingPiece = null;
 
 // Elementos DOM
 const lobbyScreen = document.getElementById('lobby');
+const createRoomScreen = document.getElementById('createRoom');
 const gameScreen = document.getElementById('game');
 const resultScreen = document.getElementById('result');
 const playerNameInput = document.getElementById('playerName');
+const roomNameInput = document.getElementById('roomName');
 const betAmountInput = document.getElementById('betAmount');
+const gameModeSelect = document.getElementById('gameMode');
+const timeLimitSelect = document.getElementById('timeLimit');
+const roomPrivacySelect = document.getElementById('roomPrivacy');
+const allowSpectatorsCheckbox = document.getElementById('allowSpectators');
 const createRoomBtn = document.getElementById('createRoomBtn');
+const confirmCreateRoomBtn = document.getElementById('confirmCreateRoomBtn');
+const backToLobbyFromCreate = document.getElementById('backToLobbyFromCreate');
 const roomsList = document.getElementById('roomsList');
 const boardElement = document.getElementById('board');
 const currentTurnElement = document.getElementById('currentTurn');
@@ -24,6 +32,12 @@ const backToLobbyBtn = document.getElementById('backToLobbyBtn');
 const resultMessage = document.getElementById('resultMessage');
 const prizeMessage = document.getElementById('prizeMessage');
 const balanceElement = document.getElementById('balance');
+
+// Elementos de preview
+const previewRoomName = document.getElementById('previewRoomName');
+const previewMode = document.getElementById('previewMode');
+const previewBet = document.getElementById('previewBet');
+const previewTime = document.getElementById('previewTime');
 
 // Saldo inicial (simulado)
 let balance = 100.00;
@@ -36,10 +50,49 @@ document.addEventListener('DOMContentLoaded', () => {
 // Atualizar imediatamente também (caso DOMContentLoaded já tenha ocorrido)
 updateBalance();
 
-// Criar sala
+// Navegação entre telas
 createRoomBtn.addEventListener('click', () => {
+  showScreen('createRoom');
+});
+
+backToLobbyFromCreate.addEventListener('click', () => {
+  showScreen('lobby');
+});
+
+// Preview da sala em tempo real
+roomNameInput?.addEventListener('input', (e) => {
+  const name = e.target.value.trim() || 'Mesa do Campeão';
+  if (previewRoomName) previewRoomName.textContent = name;
+});
+
+betAmountInput?.addEventListener('input', (e) => {
+  const bet = parseFloat(e.target.value) || 50;
+  if (previewBet) previewBet.textContent = `R$ ${bet.toFixed(2)}`;
+});
+
+gameModeSelect?.addEventListener('change', (e) => {
+  const mode = e.target.value === 'competitive' ? 'Competitivo' : 'Casual';
+  if (previewMode) previewMode.textContent = mode;
+});
+
+timeLimitSelect?.addEventListener('change', (e) => {
+  const time = parseInt(e.target.value);
+  let timeText = '';
+  if (time < 60) timeText = `${time} seg`;
+  else if (time < 3600) timeText = `${time / 60} min`;
+  else timeText = `${time / 3600} h`;
+  if (previewTime) previewTime.textContent = timeText;
+});
+
+// Criar sala (confirmação)
+confirmCreateRoomBtn?.addEventListener('click', () => {
   const playerName = playerNameInput.value.trim();
+  const roomName = roomNameInput.value.trim() || 'Mesa do Campeão';
   const betAmount = parseFloat(betAmountInput.value);
+  const gameMode = gameModeSelect.value;
+  const timeLimit = parseInt(timeLimitSelect.value);
+  const isPrivate = roomPrivacySelect.value === 'private';
+  const allowSpectators = allowSpectatorsCheckbox.checked;
   
   if (!playerName) {
     alert('Digite seu nome!');
@@ -51,7 +104,17 @@ createRoomBtn.addEventListener('click', () => {
     return;
   }
   
-  socket.emit('createRoom', { playerName, betAmount });
+  socket.emit('createRoom', { 
+    playerName, 
+    roomName,
+    betAmount,
+    gameMode,
+    timeLimit,
+    isPrivate,
+    allowSpectators
+  });
+  
+  showScreen('lobby');
 });
 
 // Socket events
@@ -64,19 +127,38 @@ socket.on('roomCreated', (room) => {
 socket.on('updateRooms', (rooms) => {
   roomsList.innerHTML = '';
   
+  if (rooms.length === 0) {
+    roomsList.innerHTML = `
+      <div style="text-align: center; padding: 3rem; color: var(--gray-400);">
+        <p>Nenhuma sala disponível no momento.</p>
+        <p style="font-size: 0.875rem; margin-top: 0.5rem;">Seja o primeiro a criar uma sala!</p>
+      </div>
+    `;
+    return;
+  }
+  
   rooms.forEach(room => {
+    const isFull = room.players >= 2;
     const roomDiv = document.createElement('div');
     roomDiv.className = 'room-item';
     roomDiv.innerHTML = `
-      <div class="room-info">
-        <strong>${room.hostName}</strong><br>
-        Aposta: R$ ${room.betAmount.toFixed(2)}
-      </div>
-      <button onclick="joinRoom('${room.id}')">Entrar</button>
+      <div class="room-name">${room.name || room.hostName}</div>
+      <div class="room-bet">R$ ${room.betAmount.toFixed(2)}</div>
+      <div class="room-players ${isFull ? 'full' : ''}">${room.players || 1}/2</div>
+      <div class="room-time">${formatTime(room.timeLimit || 300)}</div>
+      <button class="btn-enter-room" onclick="joinRoom('${room.id}')" ${isFull ? 'disabled' : ''}>
+        ${isFull ? 'Cheia' : 'Entrar'}
+      </button>
     `;
     roomsList.appendChild(roomDiv);
   });
 });
+
+function formatTime(seconds) {
+  if (seconds < 60) return `${seconds} seg`;
+  if (seconds < 3600) return `${seconds / 60} min`;
+  return `${seconds / 3600} h`;
+}
 
 function joinRoom(roomId) {
   const playerName = playerNameInput.value.trim();
