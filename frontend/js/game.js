@@ -4,6 +4,7 @@ let currentRoom = null;
 let selectedPiece = null;
 let gameBoard = null;
 let playerColor = null;
+let currentTurn = null;
 let mustContinueCapture = false;
 let continuingPiece = null;
 
@@ -92,6 +93,7 @@ function joinRoom(roomId) {
 
 socket.on('gameStart', (game) => {
   gameBoard = game.board;
+  currentTurn = game.currentTurn || 'white';
   gameBetElement.textContent = (game.betAmount * 2).toFixed(2);
   
   // Ativar áudio context com interação do usuário
@@ -101,18 +103,29 @@ socket.on('gameStart', (game) => {
   
   playSound('move');
   showScreen('game');
+  
+  // Configurar event listener do board (apenas uma vez)
+  setupBoardListener();
+  
   renderBoard();
 });
 
 socket.on('moveMade', (data) => {
+  console.log('🎮 Movimento recebido do servidor:', data);
+  
   gameBoard = data.board;
-  currentTurnElement.textContent = data.currentTurn === 'white' ? 'Brancas' : 'Pretas';
+  currentTurn = data.currentTurn;
+  
+  // Atualizar indicador de turno se existir
+  if (currentTurnElement) {
+    currentTurnElement.textContent = data.currentTurn === 'white' ? 'Brancas' : 'Pretas';
+  }
   
   // Verificar se deve continuar capturando
   mustContinueCapture = data.mustContinue || false;
   continuingPiece = data.continuingPiece || null;
   
-  if (mustContinueCapture && continuingPiece) {
+  if (mustContinueCapture && continuingPiece && currentTurn === playerColor) {
     // Auto-selecionar a peça que deve continuar capturando
     selectedPiece = continuingPiece;
     playSound('capture');
@@ -130,6 +143,7 @@ socket.on('moveMade', (data) => {
     }
   }
   
+  console.log('🔄 Renderizando tabuleiro...');
   renderBoard();
 });
 
@@ -159,9 +173,33 @@ socket.on('gameEnd', (data) => {
   showScreen('result');
 });
 
+// Atualizar indicadores visuais de turno
+function updateTurnIndicators() {
+  const player1Card = document.querySelector('.player-you');
+  const player2Card = document.querySelector('.player-opponent');
+  
+  if (player1Card && player2Card) {
+    // Remover classe active de ambos
+    player1Card.classList.remove('active-turn');
+    player2Card.classList.remove('active-turn');
+    
+    // Adicionar classe active no jogador do turno atual
+    if (currentTurn === playerColor) {
+      player1Card.classList.add('active-turn');
+    } else {
+      player2Card.classList.add('active-turn');
+    }
+  }
+}
+
 // Renderizar tabuleiro
 function renderBoard() {
+  // Usar DocumentFragment para melhorar performance
+  const fragment = document.createDocumentFragment();
   boardElement.innerHTML = '';
+  
+  // Atualizar indicadores visuais de turno
+  updateTurnIndicators();
   
   // Calcular movimentos válidos APENAS se:
   // 1. Houver peça selecionada
@@ -213,10 +251,34 @@ function renderBoard() {
         cell.appendChild(pieceElement);
       }
       
-      cell.addEventListener('click', () => handleCellClick(row, col));
-      boardElement.appendChild(cell);
+      // NÃO adicionar listener aqui - usar event delegation no board
+      fragment.appendChild(cell);
     }
   }
+  
+  // Adicionar tudo de uma vez
+  boardElement.appendChild(fragment);
+}
+
+// Event delegation - Um único listener para todo o board
+let boardListenerAdded = false;
+
+function setupBoardListener() {
+  if (boardListenerAdded) return;
+  
+  boardElement.addEventListener('click', (e) => {
+    const cell = e.target.closest('.cell');
+    if (!cell) return;
+    
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+    
+    if (!isNaN(row) && !isNaN(col)) {
+      handleCellClick(row, col);
+    }
+  });
+  
+  boardListenerAdded = true;
 }
 
 // Obter todas as capturas disponíveis para o jogador atual
@@ -324,6 +386,13 @@ function getValidMovesForPiece(position) {
 function handleCellClick(row, col) {
   const piece = gameBoard[row][col];
   
+  // Verificar se é o turno do jogador
+  if (currentTurn !== playerColor && !mustContinueCapture) {
+    playSound('error');
+    showNotification('⚠️ Aguarde sua vez de jogar!');
+    return;
+  }
+  
   // Se deve continuar capturando, só pode selecionar a peça específica
   if (mustContinueCapture && continuingPiece) {
     if (!selectedPiece) {
@@ -357,6 +426,12 @@ function handleCellClick(row, col) {
     }
     
     // Tentar mover
+    console.log('📤 Enviando movimento:', {
+      roomId: currentRoom,
+      from: selectedPiece,
+      to: { row, col }
+    });
+    
     socket.emit('movePiece', {
       roomId: currentRoom,
       move: {
@@ -364,7 +439,11 @@ function handleCellClick(row, col) {
         to: { row, col }
       }
     });
-    // Não limpar selectedPiece aqui, esperar resposta do servidor
+    
+    // Limpar seleção após enviar o movimento
+    // NÃO renderizar aqui - esperar resposta do servidor
+    selectedPiece = null;
+    
   } else if (piece && piece.color === playerColor) {
     // Selecionar peça
     selectedPiece = { row, col };

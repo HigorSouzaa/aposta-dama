@@ -95,6 +95,13 @@ io.on('connection', (socket) => {
   socket.on('movePiece', (data) => {
     const game = activeGames.get(data.roomId);
     
+    console.log('📥 Movimento recebido:', {
+      roomId: data.roomId,
+      from: data.move.from,
+      to: data.move.to,
+      playerId: socket.id
+    });
+    
     if (game && validateMove(game, data.move, socket.id)) {
       const moveResult = applyMove(game.board, data.move);
       game.board = moveResult.board;
@@ -117,6 +124,8 @@ io.on('connection', (socket) => {
         }
       }
       
+      console.log('✅ Movimento válido! Emitindo moveMade para sala:', data.roomId);
+      
       io.to(data.roomId).emit('moveMade', {
         board: game.board,
         currentTurn: game.currentTurn,
@@ -131,6 +140,7 @@ io.on('connection', (socket) => {
         handleGameEnd(data.roomId, winner);
       }
     } else {
+      console.log('❌ Movimento inválido!');
       // Enviar erro se movimento inválido
       socket.emit('invalidMove', { message: 'Movimento inválido!' });
     }

@@ -4,59 +4,167 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Damas Online - Apostas P2P</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../css/game.css">
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎲 Damas Apostas</h1>
-      <div class="wallet">
-        Saldo: R$ <span id="balance">100.00</span>
+  <!-- Header da Landing Page -->
+  <header class="main-header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        <div class="logo-icon">🎲</div>
+        <span class="logo-text">Damas Apostas</span>
+      </a>
+      
+      <nav class="nav-menu">
+        <a href="/" class="nav-link">Início</a>
+        <a href="/#features" class="nav-link">Torneios</a>
+        <a href="/#lobbies" class="nav-link">Ranking</a>
+        <a href="/jogo" class="nav-link active">Loja</a>
+      </nav>
+      
+      <div class="header-actions">
+        <button class="btn-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
+        <button class="btn-user">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </button>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Lobby -->
-    <div id="lobby" class="screen active">
-      <div class="player-info">
-        <input type="text" id="playerName" placeholder="Seu nome" />
+  <!-- Lobby -->
+  <div id="lobby" class="screen active">
+    <div class="lobby-container">
+      <div class="player-info-lobby">
+        <h2>Bem-vindo!</h2>
+        <input type="text" id="playerName" placeholder="Digite seu nome" />
       </div>
       
-      <div class="actions">
-        <div class="create-room">
-          <h3>Criar Sala</h3>
-          <input type="number" id="betAmount" placeholder="Valor da aposta (R$)" min="1" />
-          <button id="createRoomBtn">Criar Sala</button>
+      <div class="lobby-content">
+        <div class="create-room-section">
+          <h3>Criar Nova Sala</h3>
+          <div class="input-group">
+            <label>Valor da Aposta</label>
+            <input type="number" id="betAmount" placeholder="R$ 0,00" min="1" />
+          </div>
+          <button id="createRoomBtn" class="btn-primary">Criar Sala</button>
         </div>
         
-        <div class="rooms-list">
+        <div class="rooms-list-section">
           <h3>Salas Disponíveis</h3>
-          <div id="roomsList"></div>
+          <div id="roomsList" class="rooms-grid"></div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Jogo -->
-    <div id="game" class="screen">
-      <div class="game-info">
-        <div class="player-turn">
-          Turno: <span id="currentTurn">Brancas</span>
+  <!-- Jogo -->
+  <div id="game" class="screen">
+    <div class="game-container">
+      <!-- Coluna Esquerda - Jogadores -->
+      <aside class="players-sidebar">
+        <!-- Você (Jogador 1) -->
+        <div class="player-card player-you">
+          <div class="player-avatar">
+            <img src="https://ui-avatars.com/api/?name=Jogador1&background=667eea&color=fff&size=80" alt="Você" id="player1Avatar">
+            <div class="player-status online"></div>
+          </div>
+          <div class="player-details">
+            <h3 id="player1Name">Você (Jogador1)</h3>
+            <p class="player-ranking">Ranking: <span id="player1Rank">1350</span></p>
+          </div>
+          <div class="player-timer" id="player1Timer">02:30</div>
+          <div class="pieces-captured">Peças capturadas: <span id="player1Captured">2</span></div>
         </div>
-        <div class="bet-info">
-          Aposta: R$ <span id="gameBet">0.00</span>
+
+        <!-- Adversário (Jogador 2) -->
+        <div class="player-card player-opponent">
+          <div class="player-avatar">
+            <img src="https://ui-avatars.com/api/?name=Adversario&background=f5576c&color=fff&size=80" alt="Adversário" id="player2Avatar">
+            <div class="player-status online"></div>
+          </div>
+          <div class="player-details">
+            <h3 id="player2Name">Adversário</h3>
+            <p class="player-ranking">Ranking: <span id="player2Rank">2800</span></p>
+          </div>
+          <div class="player-timer" id="player2Timer">03:45</div>
+          <div class="pieces-captured">Peças capturadas: <span id="player2Captured">0</span></div>
         </div>
-      </div>
-      
-      <div id="board" class="board"></div>
-      
-      <button id="leaveGameBtn" class="btn-danger">Sair do Jogo</button>
+      </aside>
+
+      <!-- Centro - Tabuleiro -->
+      <main class="board-section">
+        <div id="board" class="board"></div>
+        
+        <div class="game-actions">
+          <button id="leaveGameBtn" class="btn-action btn-danger">Desistir</button>
+          <button id="drawBtn" class="btn-action btn-secondary">Propor Empate</button>
+          <button id="settingsBtn" class="btn-action btn-icon-only">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 1v6m0 6v6m6-12h-6m-6 0H1m17.66 4.34l-4.24 4.24m-6.84 0l-4.24-4.24M19 12h-6m-6 0H1m17.66 4.34l-4.24-4.24m-6.84 0l-4.24 4.24"></path>
+            </svg>
+          </button>
+        </div>
+      </main>
+
+      <!-- Coluna Direita - Aposta e Chat -->
+      <aside class="info-sidebar">
+        <!-- Painel de Aposta -->
+        <div class="bet-panel">
+          <h3>Aposta da Partida</h3>
+          <div class="bet-amount">
+            <span class="bet-label">Pote Total</span>
+            <span class="bet-value" id="gameBet">R$ 50,00</span>
+          </div>
+          <div class="your-bet">
+            <span class="bet-label">Sua aposta:</span>
+            <input type="number" id="userBetAmount" placeholder="R$ 0,00" />
+          </div>
+          <button class="btn-bet">Aumentar</button>
+        </div>
+
+        <!-- Chat -->
+        <div class="chat-panel">
+          <h3>Chat</h3>
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-message system">Você entrou na sala.</div>
+            <div class="chat-message opponent">Adversário enviou boa sala.</div>
+            <div class="chat-message you">Você: Boa sorte!</div>
+            <div class="chat-message opponent">Adversário: Jogada errada essa sua.</div>
+          </div>
+          <div class="chat-input-container">
+            <input type="text" id="chatInput" placeholder="Digite sua mensagem..." />
+            <button id="sendChatBtn" class="btn-send">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </aside>
     </div>
+  </div>
 
-    <!-- Resultado -->
-    <div id="result" class="screen">
+  <!-- Resultado -->
+  <div id="result" class="screen">
+    <div class="result-container">
       <div class="result-card">
+        <div class="result-icon">🏆</div>
         <h2 id="resultMessage"></h2>
         <p id="prizeMessage"></p>
-        <button id="backToLobbyBtn">Voltar ao Lobby</button>
+        <button id="backToLobbyBtn" class="btn-primary">Voltar ao Lobby</button>
       </div>
     </div>
   </div>
