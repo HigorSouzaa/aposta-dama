@@ -7,6 +7,15 @@ let playerColor = null;
 let currentTurn = null;
 let mustContinueCapture = false;
 let continuingPiece = null;
+let isPlayingAgainstBot = false;
+let botDifficulty = 'medium';
+
+// Timer
+let turnTimeLimit = 60; // segundos
+let currentTimer = 0;
+let timerInterval = null;
+let player1TimerElement = null;
+let player2TimerElement = null;
 
 // Elementos DOM
 const lobbyScreen = document.getElementById('lobby');
@@ -15,6 +24,7 @@ const gameScreen = document.getElementById('game');
 const resultScreen = document.getElementById('result');
 const playerNameInput = document.getElementById('playerName');
 const roomNameInput = document.getElementById('roomName');
+const botDifficultySelect = document.getElementById('botDifficulty');
 const betAmountInput = document.getElementById('betAmount');
 const gameModeSelect = document.getElementById('gameMode');
 const timeLimitSelect = document.getElementById('timeLimit');
@@ -45,10 +55,42 @@ let balance = 100.00;
 // Inicializar saldo quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
   updateBalance();
+  
+  // Inicializar elementos do timer
+  player1TimerElement = document.getElementById('player1Timer');
+  player2TimerElement = document.getElementById('player2Timer');
 });
 
 // Atualizar imediatamente também (caso DOMContentLoaded já tenha ocorrido)
 updateBalance();
+
+// Seletor de tipo de jogo (PvP vs Bot)
+document.addEventListener('DOMContentLoaded', () => {
+  const gameTypeBtns = document.querySelectorAll('.game-type-btn');
+  const roomNameGroup = document.getElementById('roomNameGroup');
+  const botDifficultyGroup = document.getElementById('botDifficultyGroup');
+  
+  gameTypeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active de todos
+      gameTypeBtns.forEach(b => b.classList.remove('active'));
+      // Adiciona active no clicado
+      btn.classList.add('active');
+      
+      const gameType = btn.dataset.type;
+      isPlayingAgainstBot = gameType === 'bot';
+      
+      // Mostra/esconde campos apropriados
+      if (isPlayingAgainstBot) {
+        roomNameGroup.style.display = 'none';
+        botDifficultyGroup.style.display = 'block';
+      } else {
+        roomNameGroup.style.display = 'block';
+        botDifficultyGroup.style.display = 'none';
+      }
+    });
+  });
+});
 
 // Navegação entre telas
 createRoomBtn.addEventListener('click', () => {
@@ -87,12 +129,7 @@ timeLimitSelect?.addEventListener('change', (e) => {
 // Criar sala (confirmação)
 confirmCreateRoomBtn?.addEventListener('click', () => {
   const playerName = playerNameInput.value.trim();
-  const roomName = roomNameInput.value.trim() || 'Mesa do Campeão';
   const betAmount = parseFloat(betAmountInput.value);
-  const gameMode = gameModeSelect.value;
-  const timeLimit = parseInt(timeLimitSelect.value);
-  const isPrivate = roomPrivacySelect.value === 'private';
-  const allowSpectators = allowSpectatorsCheckbox.checked;
   
   if (!playerName) {
     alert('Digite seu nome!');
@@ -104,15 +141,32 @@ confirmCreateRoomBtn?.addEventListener('click', () => {
     return;
   }
   
-  socket.emit('createRoom', { 
-    playerName, 
-    roomName,
-    betAmount,
-    gameMode,
-    timeLimit,
-    isPrivate,
-    allowSpectators
-  });
+  if (isPlayingAgainstBot) {
+    // Jogar contra bot
+    botDifficulty = botDifficultySelect.value;
+    socket.emit('createBotGame', { 
+      playerName, 
+      betAmount,
+      difficulty: botDifficulty
+    });
+  } else {
+    // Jogar PvP
+    const roomName = roomNameInput.value.trim() || 'Mesa do Campeão';
+    const gameMode = gameModeSelect.value;
+    const timeLimit = parseInt(timeLimitSelect.value);
+    const isPrivate = roomPrivacySelect.value === 'private';
+    const allowSpectators = allowSpectatorsCheckbox.checked;
+    
+    socket.emit('createRoom', { 
+      playerName, 
+      roomName,
+      betAmount,
+      gameMode,
+      timeLimit,
+      isPrivate,
+      allowSpectators
+    });
+  }
   
   showScreen('lobby');
 });
@@ -176,6 +230,23 @@ function joinRoom(roomId) {
 socket.on('gameStart', (game) => {
   gameBoard = game.board;
   currentTurn = game.currentTurn || 'white';
+  currentRoom = game.id || game.roomId;
+  
+  // Configurar tempo de turno
+  turnTimeLimit = game.timeLimit || 60;
+  console.log(`⏰ Tempo por turno: ${turnTimeLimit} segundos`);
+  
+  // Verificar se é jogo contra bot
+  if (game.isBot) {
+    isPlayingAgainstBot = true;
+    botDifficulty = game.botDifficulty || 'medium';
+    playerColor = 'white'; // Jogador sempre é branco contra bot
+    console.log(`🤖 Iniciando jogo contra BOT (${botDifficulty})`);
+    console.log(`🎲 Sorteio: ${currentTurn === 'white' ? 'Você começa!' : 'BOT começa!'}`);
+  } else {
+    isPlayingAgainstBot = false;
+  }
+  
   gameBetElement.textContent = (game.betAmount * 2).toFixed(2);
   
   // Ativar áudio context com interação do usuário
@@ -190,6 +261,29 @@ socket.on('gameStart', (game) => {
   setupBoardListener();
   
   renderBoard();
+  
+  // Mostrar notificação de quem começa
+  setTimeout(() => {
+    if (isPlayingAgainstBot) {
+      if (currentTurn === 'white') {
+        showNotification('🎲 Você foi sorteado para começar!');
+      } else {
+        showNotification('🎲 BOT foi sorteado para começar!');
+      }
+    } else {
+      if (currentTurn === playerColor) {
+        showNotification('🎲 Você foi sorteado para começar!');
+      } else {
+        showNotification('🎲 Seu adversário foi sorteado para começar!');
+      }
+    }
+    
+    // Iniciar timer
+    startTimer();
+  }, 500);
+  
+  // Bot agora é gerenciado 100% pelo servidor
+  // Não precisa mais de lógica no cliente
 });
 
 socket.on('moveMade', (data) => {
@@ -212,6 +306,7 @@ socket.on('moveMade', (data) => {
     selectedPiece = continuingPiece;
     playSound('capture');
     showNotification('🎯 Continue capturando! Clique onde quer mover.');
+    // Não reinicia timer, continua o mesmo turno
   } else {
     selectedPiece = null;
     mustContinueCapture = false;
@@ -223,10 +318,15 @@ socket.on('moveMade', (data) => {
     } else {
       playSound('move');
     }
+    
+    // Reiniciar timer para o próximo turno
+    startTimer();
   }
   
   console.log('🔄 Renderizando tabuleiro...');
   renderBoard();
+  
+  // Bot agora é gerenciado 100% pelo servidor - não fazer nada aqui
 });
 
 socket.on('invalidMove', (data) => {
@@ -237,6 +337,8 @@ socket.on('invalidMove', (data) => {
 });
 
 socket.on('gameEnd', (data) => {
+  stopTimer(); // Parar o timer quando o jogo terminar
+  
   const won = data.winner === playerColor;
   
   if (won) {
@@ -270,6 +372,17 @@ function updateTurnIndicators() {
       player1Card.classList.add('active-turn');
     } else {
       player2Card.classList.add('active-turn');
+    }
+  }
+  
+  // Atualizar nomes dos jogadores se for contra bot
+  if (isPlayingAgainstBot) {
+    const player2Name = document.getElementById('player2Name');
+    if (player2Name) {
+      const botEmoji = botDifficulty === 'easy' ? '🤖' :
+                       botDifficulty === 'medium' ? '🤖💪' :
+                       botDifficulty === 'hard' ? '🤖🔥' : '🤖👑';
+      player2Name.textContent = `${botEmoji} BOT ${botDifficulty.toUpperCase()}`;
     }
   }
 }
@@ -637,3 +750,144 @@ function showNotification(message) {
     setTimeout(() => notification.remove(), 500);
   }, 3000);
 }
+
+// ==================== SISTEMA DE TIMER ====================
+
+function formatTimer(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function updateTimerDisplay() {
+  if (!player1TimerElement || !player2TimerElement) return;
+  
+  const formattedTime = formatTimer(currentTimer);
+  
+  if (currentTurn === playerColor) {
+    player1TimerElement.textContent = formattedTime;
+    
+    // Alerta visual quando tempo está acabando
+    if (currentTimer <= 10) {
+      player1TimerElement.classList.add('warning');
+    } else {
+      player1TimerElement.classList.remove('warning');
+    }
+  } else {
+    player2TimerElement.textContent = formattedTime;
+    
+    if (currentTimer <= 10) {
+      player2TimerElement.classList.add('warning');
+    } else {
+      player2TimerElement.classList.remove('warning');
+    }
+  }
+}
+
+function startTimer() {
+  // Limpar timer anterior se existir
+  if (timerInterval) {
+    clearInterval(timerInterval);
+  }
+  
+  currentTimer = turnTimeLimit;
+  updateTimerDisplay();
+  
+  timerInterval = setInterval(() => {
+    currentTimer--;
+    updateTimerDisplay();
+    
+    // Avisos sonoros
+    if (currentTimer === 10) {
+      playSound('error');
+      showNotification('⏰ 10 segundos restantes!');
+    } else if (currentTimer === 5) {
+      playSound('error');
+    } else if (currentTimer === 0) {
+      // Tempo esgotado!
+      handleTimeOut();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function handleTimeOut() {
+  stopTimer();
+  
+  console.log('⏰ Tempo esgotado!');
+  
+  if (currentTurn === playerColor) {
+    // É o turno do jogador - fazer movimento automático
+    showNotification('⏰ Tempo esgotado! Movimento automático...');
+    playSound('error');
+    
+    setTimeout(() => {
+      makeRandomMove();
+    }, 500);
+  }
+  // Bot é gerenciado pelo servidor - não precisa forçar movimento aqui
+}
+
+function makeRandomMove() {
+  // Encontrar todas as peças do jogador
+  const playerPieces = [];
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = gameBoard[row][col];
+      if (piece && piece.color === playerColor) {
+        playerPieces.push({ row, col });
+      }
+    }
+  }
+  
+  if (playerPieces.length === 0) return;
+  
+  // Tentar encontrar um movimento válido
+  let moveMade = false;
+  const shuffled = playerPieces.sort(() => Math.random() - 0.5);
+  
+  for (const piece of shuffled) {
+    // Tentar movimentos simples em todas as direções
+    const directions = [
+      [-1, -1], [-1, 1], [1, -1], [1, 1]
+    ];
+    
+    for (const [dr, dc] of directions) {
+      const newRow = piece.row + dr;
+      const newCol = piece.col + dc;
+      
+      if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+        if (!gameBoard[newRow][newCol]) {
+          // Encontrou um movimento válido
+          console.log('🎲 Movimento automático:', { from: piece, to: { row: newRow, col: newCol } });
+          
+          socket.emit('movePiece', {
+            roomId: currentRoom,
+            move: {
+              from: piece,
+              to: { row: newRow, col: newCol }
+            }
+          });
+          
+          moveMade = true;
+          break;
+        }
+      }
+    }
+    
+    if (moveMade) break;
+  }
+  
+  if (!moveMade) {
+    console.log('❌ Não foi possível fazer movimento automático');
+    showNotification('❌ Sem movimentos válidos!');
+  }
+}
+
+

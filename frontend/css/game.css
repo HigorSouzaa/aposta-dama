@@ -414,6 +414,26 @@ body {
   color: var(--white);
   margin-bottom: 0.5rem;
   font-family: 'Courier New', monospace;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.player-timer.warning {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: #ef4444;
+  animation: pulse-timer 1s infinite;
+}
+
+@keyframes pulse-timer {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
 }
 
 .pieces-captured {
@@ -1340,5 +1360,61 @@ body {
   font-size: 1.125rem;
   font-weight: 700;
   color: var(--white);
+}
+
+/* ========== GAME TYPE SELECTOR ========== */
+.game-type-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.game-type-btn {
+  padding: 1.5rem 1rem;
+  background: var(--card-darker);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  color: var(--gray-300);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.game-type-btn svg {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 0.25rem;
+}
+
+.game-type-btn span {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.game-type-btn small {
+  font-size: 0.75rem;
+  color: var(--gray-400);
+  line-height: 1.2;
+}
+
+.game-type-btn:hover {
+  border-color: var(--primary);
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateY(-2px);
+}
+
+.game-type-btn.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.game-type-btn.active svg {
+  color: var(--primary);
 }
 
