@@ -9,6 +9,11 @@ let mustContinueCapture = false;
 let continuingPiece = null;
 let isPlayingAgainstBot = false;
 let botDifficulty = 'medium';
+let myPlayerName = ''; // Armazena o nome do jogador atual
+
+// Peças capturadas
+let whiteCaptured = 0;
+let blackCaptured = 0;
 
 // Timer
 let turnTimeLimit = 60; // segundos
@@ -137,6 +142,9 @@ confirmCreateRoomBtn?.addEventListener('click', () => {
     playerNameInput.value = playerName;
   }
   
+  // Armazenar nome do jogador
+  myPlayerName = playerName;
+  
   // Validar aposta
   if (betAmount <= 0) {
     alert('Valor de aposta deve ser maior que zero!');
@@ -261,6 +269,9 @@ function confirmJoinRoom() {
     playerName = `Jogador${Math.floor(Math.random() * 10000)}`;
   }
   
+  // Armazenar nome do jogador
+  myPlayerName = playerName;
+  
   if (pendingRoomId) {
     currentRoom = pendingRoomId;
     playerColor = 'black';
@@ -315,6 +326,17 @@ socket.on('gameStart', (game) => {
   setupBoardListener();
   
   renderBoard();
+  
+  // Resetar peças capturadas e atualizar
+  whiteCaptured = 0;
+  blackCaptured = 0;
+  updateCapturedPieces();
+  
+  // Resetar chat
+  resetChat();
+  
+  // Adicionar mensagem de boas-vindas no chat
+  addChatMessage('🎮 Jogo iniciado! Boa sorte!', 'system');
   
   // Mostrar notificação de quem começa
   setTimeout(() => {
@@ -379,6 +401,9 @@ socket.on('moveMade', (data) => {
   
   console.log('🔄 Renderizando tabuleiro...');
   renderBoard();
+  
+  // Atualizar contagem de peças capturadas
+  countCapturedPieces(gameBoard);
   
   // Bot agora é gerenciado 100% pelo servidor - não fazer nada aqui
 });
@@ -942,6 +967,105 @@ function makeRandomMove() {
     console.log('❌ Não foi possível fazer movimento automático');
     showNotification('❌ Sem movimentos válidos!');
   }
+}
+
+// ==================== CHAT ====================
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendChatBtn = document.getElementById('sendChatBtn');
+
+// Resetar chat (limpar mensagens)
+function resetChat() {
+  if (!chatMessages) return;
+  chatMessages.innerHTML = '';
+}
+
+// Adicionar mensagem ao chat
+function addChatMessage(message, type = 'system') {
+  if (!chatMessages) return;
+  
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `chat-message ${type}`;
+  messageDiv.textContent = message;
+  chatMessages.appendChild(messageDiv);
+  
+  // Scroll para o fim
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Enviar mensagem
+function sendChatMessage() {
+  if (!chatInput) return;
+  
+  const message = chatInput.value.trim();
+  if (!message) return;
+  
+  // Adicionar mensagem própria com nome real
+  addChatMessage(`${myPlayerName}: ${message}`, 'you');
+  
+  // Enviar para o servidor com nome
+  socket.emit('chatMessage', {
+    roomId: currentRoom,
+    message: message,
+    playerName: myPlayerName
+  });
+  
+  // Limpar input
+  chatInput.value = '';
+}
+
+// Event listeners do chat
+if (sendChatBtn) {
+  sendChatBtn.addEventListener('click', sendChatMessage);
+}
+
+if (chatInput) {
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendChatMessage();
+    }
+  });
+}
+
+// Receber mensagem do chat
+socket.on('chatMessage', (data) => {
+  addChatMessage(`${data.playerName}: ${data.message}`, 'opponent');
+});
+
+// ==================== PEÇAS CAPTURADAS ====================
+function updateCapturedPieces() {
+  const player1CapturedElement = document.getElementById('player1Captured');
+  const player2CapturedElement = document.getElementById('player2Captured');
+  
+  if (player1CapturedElement) {
+    player1CapturedElement.textContent = whiteCaptured;
+  }
+  
+  if (player2CapturedElement) {
+    player2CapturedElement.textContent = blackCaptured;
+  }
+}
+
+// Contar peças capturadas comparando com estado inicial
+function countCapturedPieces(board) {
+  let whiteCount = 0;
+  let blackCount = 0;
+  
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece) {
+        if (piece.color === 'white') whiteCount++;
+        if (piece.color === 'black') blackCount++;
+      }
+    }
+  }
+  
+  // Cada lado começa com 12 peças
+  whiteCaptured = 12 - whiteCount;
+  blackCaptured = 12 - blackCount;
+  
+  updateCapturedPieces();
 }
 
 

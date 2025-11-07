@@ -40,6 +40,37 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Scrollbar customizada - invisível/discreta */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
 /* Header da Landing Page */
 .main-header {
   position: sticky;
@@ -712,6 +743,19 @@ body {
   overflow-y: auto;
   margin-bottom: 0.75rem;
   padding-right: 0.5rem;
+  min-height: 200px;
+  position: relative;
+}
+
+.chat-messages:empty::before {
+  content: 'Nenhuma mensagem ainda...';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--gray-400);
+  font-size: 0.875rem;
+  font-style: italic;
 }
 
 .chat-message {
@@ -887,6 +931,48 @@ body {
   border-radius: 10px;
 }
 
+/* Footer */
+footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(16, 22, 34, 0.5);
+  margin-top: 4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.footer-content {
+  padding: 2rem 1rem;
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footer-copyright {
+  font-size: 0.875rem;
+  color: var(--gray-400);
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-link {
+  font-size: 0.875rem;
+  color: var(--gray-400);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-link:hover {
+  color: var(--white);
+}
+
 /* Responsivo */
 @media (max-width: 1400px) {
   .game-container {
@@ -937,6 +1023,29 @@ body {
   
   .players-sidebar {
     flex-direction: column;
+  }
+  
+  .footer-inner {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+}
+
+@media (min-width: 768px) {
+  .footer-inner {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer-content {
+    padding: 2rem 2rem;
   }
 }
 

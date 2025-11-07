@@ -322,13 +322,10 @@
         <div class="chat-panel">
           <h3>Chat</h3>
           <div class="chat-messages" id="chatMessages">
-            <div class="chat-message system">Você entrou na sala.</div>
-            <div class="chat-message opponent">Adversário enviou boa sala.</div>
-            <div class="chat-message you">Você: Boa sorte!</div>
-            <div class="chat-message opponent">Adversário: Jogada errada essa sua.</div>
+            <!-- Mensagens do chat aparecerão aqui -->
           </div>
           <div class="chat-input-container">
-            <input type="text" id="chatInput" placeholder="Digite sua mensagem..." />
+            <input type="text" id="chatInput" placeholder="Digite sua mensagem..." maxlength="200" />
             <button id="sendChatBtn" class="btn-send">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -352,6 +349,22 @@
       </div>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div class="footer-inner">
+        <p class="footer-copyright">
+          © 2024 Damas Online. Todos os direitos reservados.
+        </p>
+        <div class="footer-links">
+          <a class="footer-link" href="/termos">Termos de Serviço</a>
+          <a class="footer-link" href="/privacidade">Política de Privacidade</a>
+          <a class="footer-link" href="/jogo-responsavel">Jogo Responsável</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <!-- Modal para entrar em sala -->
   <div id="joinRoomModal" class="modal" style="display: none;">

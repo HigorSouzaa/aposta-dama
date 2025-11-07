@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jogo Responsável - Damas Online</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/index.css" />
+    <link rel="stylesheet" href="../css/legal.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <!-- Header -->
+      <header>
+        <div class="header-logo">
+          <div class="logo-icon">
+            <svg
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22.04 7.42C22.04 8.79 19.96 10 17 10.57C19.96 11.14 22.04 12.35 22.04 13.71C22.04 15.08 19.96 16.29 17 16.86C19.96 17.43 22.04 18.64 22.04 20C22.04 22.21 17.52 24 12 24C6.48 24 1.96 22.21 1.96 20C1.96 18.64 4.04 17.43 7 16.86C4.04 16.29 1.96 15.08 1.96 13.71C1.96 12.35 4.04 11.14 7 10.57C4.04 10 1.96 8.79 1.96 7.42C1.96 5.21 6.48 3.42 12 3.42C17.52 3.42 22.04 5.21 22.04 7.42Z"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="logo-title">🎲 Damas Apostas</h2>
+        </div>
+        <nav class="header-nav">
+          <a class="nav-link" href="#jogar">Jogar Agora</a>
+          <a class="nav-link" href="#como-funciona">Como Funciona</a>
+          <a class="nav-link" href="#lobbies">Lobbies</a>
+        </nav>
+        <div class="header-buttons">
+          <button onclick="redirectToLogin()" class="btn btn-secondary">
+            <span class="truncate">Login</span>
+          </button>
+          <button onclick="redirectToRegister()" class="btn btn-primary">
+            <span class="truncate">Registrar</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="legal-content">
+        <div class="container">
+          <div class="legal-header">
+            <h1 class="legal-title">Jogo Responsável</h1>
+            <p class="legal-update">
+              O nosso compromisso é que você se divirta com segurança e
+              responsabilidade
+            </p>
+          </div>
+
+          <div class="legal-sections">
+            <!-- Introdução -->
+            <div class="legal-section highlight-section">
+              <h2 class="section-title">Nosso Compromisso</h2>
+              <div class="section-content">
+                <p class="large-text">
+                  No Damas Apostas, acreditamos que jogar deve ser uma
+                  experiência divertida e de entretenimento. Estamos
+                  comprometidos em promover o jogo responsável e fornecer
+                  ferramentas para ajudá-lo a manter o controle sobre seus
+                  hábitos de jogo.
+                </p>
+                <p>
+                  Se você ou alguém que conhece está tendo problemas com jogos
+                  de azar, não hesite em buscar ajuda. Existem recursos
+                  disponíveis.
+                </p>
+              </div>
+            </div>
+
+            <!-- Sinais de Alerta -->
+            <div class="legal-section warning-section">
+              <h2 class="section-title">
+                ⚠️ Sinais de Alerta - Reconheça o Problema
+              </h2>
+              <div class="section-content">
+                <p>
+                  O jogo pode se tornar problemático quando interfere na sua
+                  vida diária. Fique atento aos seguintes sinais:
+                </p>
+                <ul class="legal-list highlight-list">
+                  <li>Gastar mais dinheiro ou tempo do que pode permitir</li>
+                  <li>
+                    Tentar recuperar perdas apostando ainda mais (perseguir
+                    perdas)
+                  </li>
+                  <li>
+                    Negligenciar responsabilidades pessoais, profissionais ou
+                    familiares
+                  </li>
+                  <li>Pedir dinheiro emprestado para jogar</li>
+                  <li>Mentir sobre quanto tempo ou dinheiro gasta jogando</li>
+                  <li>
+                    Sentir-se ansioso, irritado ou deprimido quando não está
+                    jogando
+                  </li>
+                  <li>
+                    Usar o jogo como fuga de problemas ou sentimentos negativos
+                  </li>
+                  <li>Tentar parar ou reduzir, mas não conseguir</li>
+                </ul>
+                <p class="legal-warning">
+                  🚨 Se você reconhece três ou mais desses sinais em si mesmo, é
+                  hora de buscar ajuda profissional.
+                </p>
+              </div>
+            </div>
+
+            <!-- Ferramentas -->
+            <div class="legal-section">
+              <h2 class="section-title">
+                🛠️ Ferramentas para Manter o Controle
+              </h2>
+              <div class="section-content">
+                <p>
+                  Oferecemos várias ferramentas para ajudá-lo a jogar de forma
+                  responsável:
+                </p>
+
+                <div class="tools-grid">
+                  <div class="tool-card">
+                    <div class="tool-icon">💰</div>
+                    <h3 class="tool-title">Limites de Depósito</h3>
+                    <p>
+                      Defina limites diários, semanais ou mensais para seus
+                      depósitos. Isso ajuda a controlar quanto dinheiro você
+                      coloca na plataforma.
+                    </p>
+                    <button class="tool-button">Configurar Limites</button>
+                  </div>
+
+                  <div class="tool-card">
+                    <div class="tool-icon">⏱️</div>
+                    <h3 class="tool-title">Limites de Sessão</h3>
+                    <p>
+                      Estabeleça quanto tempo você pode jogar por dia. Receba
+                      alertas quando atingir o limite e seja automaticamente
+                      desconectado.
+                    </p>
+                    <button class="tool-button">Definir Tempo</button>
+                  </div>
+
+                  <div class="tool-card">
+                    <div class="tool-icon">💸</div>
+                    <h3 class="tool-title">Limites de Perda</h3>
+                    <p>
+                      Defina o valor máximo que você está disposto a perder em
+                      um período. Ao atingir o limite, você não poderá mais
+                      apostar.
+                    </p>
+                    <button class="tool-button">Configurar Perdas</button>
+                  </div>
+
+                  <div class="tool-card">
+                    <div class="tool-icon">⏸️</div>
+                    <h3 class="tool-title">Autoexclusão</h3>
+                    <p>
+                      Faça uma pausa temporária ou permanente. Durante este
+                      período, você não poderá acessar sua conta nem fazer
+                      apostas.
+                    </p>
+                    <button class="tool-button">Solicitar Pausa</button>
+                  </div>
+
+                  <div class="tool-card">
+                    <div class="tool-icon">📊</div>
+                    <h3 class="tool-title">Histórico de Jogo</h3>
+                    <p>
+                      Acompanhe seu histórico completo de apostas, ganhos e
+                      perdas. A transparência ajuda você a avaliar seus hábitos.
+                    </p>
+                    <button class="tool-button">Ver Histórico</button>
+                  </div>
+
+                  <div class="tool-card">
+                    <div class="tool-icon">🔔</div>
+                    <h3 class="tool-title">Alertas e Lembretes</h3>
+                    <p>
+                      Receba notificações sobre seu tempo de jogo e gastos para
+                      manter a consciência do seu comportamento.
+                    </p>
+                    <button class="tool-button">Ativar Alertas</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dicas -->
+            <div class="legal-section">
+              <h2 class="section-title">
+                💡 Dicas para Jogar com Responsabilidade
+              </h2>
+              <div class="section-content">
+                <ul class="legal-list tips-list">
+                  <li>
+                    <strong>Estabeleça um orçamento:</strong> Decida quanto pode
+                    gastar antes de começar e nunca exceda esse valor
+                  </li>
+                  <li>
+                    <strong>Trate como entretenimento:</strong> Considere o
+                    dinheiro gasto como custo de diversão, não como investimento
+                  </li>
+                  <li>
+                    <strong>Não persiga perdas:</strong> Aceite as perdas como
+                    parte do jogo e nunca tente recuperá-las apostando mais
+                  </li>
+                  <li>
+                    <strong>Faça pausas regulares:</strong> Levante-se,
+                    estique-se, tome água. Não jogue por longos períodos
+                  </li>
+                  <li>
+                    <strong>Nunca jogue sob influência:</strong> Evite jogar
+                    quando estiver sob efeito de álcool ou substâncias
+                  </li>
+                  <li>
+                    <strong>Não jogue quando estressado:</strong> O jogo não é
+                    solução para problemas emocionais ou financeiros
+                  </li>
+                  <li>
+                    <strong>Mantenha o equilíbrio:</strong> Dedique tempo a
+                    outras atividades, família e responsabilidades
+                  </li>
+                  <li>
+                    <strong>Jogue apenas com seu próprio dinheiro:</strong>
+                    Nunca peça emprestado para jogar
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Para Menores -->
+            <div class="legal-section warning-section">
+              <h2 class="section-title">👶 Proteção de Menores</h2>
+              <div class="section-content">
+                <p class="large-text">
+                  <strong
+                    >É ILEGAL para menores de 18 anos jogar ou apostar em nossa
+                    plataforma.</strong
+                  >
+                </p>
+                <ul class="legal-list">
+                  <li>
+                    Verificamos rigorosamente a idade de todos os usuários
+                  </li>
+                  <li>
+                    Encorajamos pais a usarem software de controle parental
+                  </li>
+                  <li>
+                    Bloqueamos imediatamente contas de menores identificados
+                  </li>
+                  <li>Não direcionamos marketing para menores de idade</li>
+                </ul>
+                <p class="legal-note">
+                  Se você acredita que um menor criou uma conta, por favor nos
+                  informe imediatamente: suporte@damasapostas.com
+                </p>
+              </div>
+            </div>
+
+            <!-- Recursos de Ajuda -->
+            <div class="legal-section help-section">
+              <h2 class="section-title">🆘 Recursos de Ajuda e Suporte</h2>
+              <div class="section-content">
+                <p>
+                  Se você está lutando contra problemas com jogo, existem
+                  organizações especializadas que podem ajudar:
+                </p>
+
+                <div class="help-resources">
+                  <div class="help-card">
+                    <h3>🇧🇷 Jogadores Anônimos Brasil</h3>
+                    <p>Grupo de apoio para pessoas com problemas com jogo.</p>
+                    <p>
+                      <strong>Website:</strong>
+                      <a
+                        href="https://www.jogadoresanonimos.com.br"
+                        target="_blank"
+                        >jogadoresanonimos.com.br</a
+                      >
+                    </p>
+                    <p>
+                      <strong>Reuniões:</strong> Consulte o site para encontrar
+                      reuniões presenciais e online
+                    </p>
+                  </div>
+
+                  <div class="help-card">
+                    <h3>📞 CVV - Centro de Valorização da Vida</h3>
+                    <p>Apoio emocional e prevenção do suicídio.</p>
+                    <p><strong>Telefone:</strong> 188 (24 horas, gratuito)</p>
+                    <p>
+                      <strong>Website:</strong>
+                      <a href="https://www.cvv.org.br" target="_blank"
+                        >cvv.org.br</a
+                      >
+                    </p>
+                  </div>
+
+                  <div class="help-card">
+                    <h3>🏥 CAPS - Centro de Atenção Psicossocial</h3>
+                    <p>Atendimento público em saúde mental.</p>
+                    <p>
+                      <strong>Info:</strong> Procure a unidade CAPS mais próxima
+                      através da UBS de sua região
+                    </p>
+                    <p>
+                      <strong>SUS:</strong> 136 (para informações sobre
+                      serviços)
+                    </p>
+                  </div>
+
+                  <div class="help-card">
+                    <h3>🌐 Gambling Therapy</h3>
+                    <p>Suporte online internacional em português.</p>
+                    <p>
+                      <strong>Website:</strong>
+                      <a
+                        href="https://www.gamblingtherapy.org/pt"
+                        target="_blank"
+                        >gamblingtherapy.org/pt</a
+                      >
+                    </p>
+                    <p>
+                      <strong>Serviços:</strong> Chat online, fóruns e recursos
+                    </p>
+                  </div>
+                </div>
+
+                <div class="info-box">
+                  <h4>🔒 Nossa Equipe de Suporte</h4>
+                  <p>
+                    Nossa equipe está disponível para ajudá-lo a configurar
+                    limites ou discutir opções de autoexclusão:
+                  </p>
+                  <p>
+                    <strong>Email:</strong> jogoresponsavel@damasapostas.com
+                  </p>
+                  <p><strong>Telefone:</strong> +55 (11) 1234-5678</p>
+                  <p><strong>Horário:</strong> 24 horas, 7 dias por semana</p>
+                  <p class="legal-note">
+                    Todas as comunicações são tratadas com estrita
+                    confidencialidade.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Família e Amigos -->
+            <div class="legal-section">
+              <h2 class="section-title">👨‍👩‍👧‍👦 Para Família e Amigos</h2>
+              <div class="section-content">
+                <p>
+                  Se você está preocupado com o comportamento de jogo de alguém
+                  próximo:
+                </p>
+                <ul class="legal-list">
+                  <li>
+                    <strong>Converse abertamente:</strong> Expresse suas
+                    preocupações sem julgamentos
+                  </li>
+                  <li>
+                    <strong>Ofereça suporte:</strong> Esteja presente e mostre
+                    que você se importa
+                  </li>
+                  <li>
+                    <strong>Busque orientação:</strong> Procure aconselhamento
+                    sobre como ajudar
+                  </li>
+                  <li>
+                    <strong>Não empreste dinheiro:</strong> Isso pode facilitar
+                    o problema
+                  </li>
+                  <li>
+                    <strong>Cuide de si mesmo:</strong> O problema de jogo afeta
+                    toda a família
+                  </li>
+                </ul>
+                <p>
+                  Recursos para familiares também estão disponíveis através das
+                  organizações listadas acima.
+                </p>
+              </div>
+            </div>
+
+            <!-- Compromisso -->
+            <div class="legal-section highlight-section">
+              <h2 class="section-title">✅ Nosso Compromisso Contínuo</h2>
+              <div class="section-content">
+                <p>No Damas Apostas, estamos comprometidos em:</p>
+                <ul class="legal-list">
+                  <li>Promover práticas de jogo responsável</li>
+                  <li>Fornecer ferramentas eficazes de autocontrole</li>
+                  <li>
+                    Treinar nossa equipe para identificar comportamentos
+                    problemáticos
+                  </li>
+                  <li>Colaborar com organizações de ajuda</li>
+                  <li>Revisar e melhorar constantemente nossas políticas</li>
+                  <li>Nunca incentivar jogo excessivo ou irresponsável</li>
+                </ul>
+                <p class="large-text">
+                  <strong
+                    >Lembre-se: O jogo deve ser diversão, não um problema. Se
+                    precisar de ajuda, não hesite em buscar.</strong
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer>
+        <div class="container footer-content">
+          <div class="footer-inner">
+            <p class="footer-copyright">
+              © 2024 Damas Online. Todos os direitos reservados.
+            </p>
+            <div class="footer-links">
+              <a class="footer-link" href="/termos">Termos de Serviço</a>
+              <a class="footer-link" href="/privacidade"
+                >Política de Privacidade</a
+              >
+              <a class="footer-link" href="/jogo-responsavel"
+                >Jogo Responsável</a
+              >
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -97,7 +97,10 @@ if (loginForm) {
     let hasError = false;
     
     if (!emailInput.value.trim()) {
-      showError('email', 'Email ou usuário é obrigatório');
+      showError('email', 'Email é obrigatório');
+      hasError = true;
+    } else if (!isValidEmail(emailInput.value)) {
+      showError('email', 'Email inválido');
       hasError = true;
     }
     
@@ -111,26 +114,32 @@ if (loginForm) {
     
     if (hasError) return;
     
-    // Simular login (por enquanto)
+    // Login via API
     setButtonLoading(submitButton, true);
     
     try {
-      // Aqui você faria a requisição ao backend
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Fazer requisição ao backend
+      const response = await ApiService.login(
+        emailInput.value.trim(),
+        passwordInput.value
+      );
       
-      // Simular sucesso
-      console.log('✅ Login realizado com sucesso!');
-      
-      // Salvar no localStorage (temporário)
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', emailInput.value);
-      
-      // Redirecionar para o jogo
-      window.location.href = '/jogo';
+      if (response.data.success) {
+        console.log('✅ Login realizado com sucesso!');
+        console.log('Usuário:', ApiService.getUser());
+        
+        // Redirecionar para o jogo
+        window.location.href = '/jogo';
+      } else {
+        // Mostrar mensagem de erro do backend
+        const errorMessage = response.data.message || 'Email ou senha incorretos';
+        showError('password', errorMessage);
+        setButtonLoading(submitButton, false);
+      }
       
     } catch (error) {
       console.error('❌ Erro no login:', error);
-      showError('password', 'Email ou senha incorretos');
+      showError('password', 'Erro ao conectar com o servidor. Tente novamente.');
       setButtonLoading(submitButton, false);
     }
   });
@@ -169,6 +178,12 @@ if (registerForm) {
     } else if (usernameInput.value.trim().length < 3) {
       showError('username', 'Usuário deve ter pelo menos 3 caracteres');
       hasError = true;
+    } else if (usernameInput.value.trim().length > 20) {
+      showError('username', 'Usuário deve ter no máximo 20 caracteres');
+      hasError = true;
+    } else if (!/^[a-zA-Z0-9_]+$/.test(usernameInput.value.trim())) {
+      showError('username', 'Usuário deve conter apenas letras, números e _');
+      hasError = true;
     }
     
     if (!emailInput.value.trim()) {
@@ -184,6 +199,9 @@ if (registerForm) {
       hasError = true;
     } else if (passwordInput.value.length < 6) {
       showError('password', 'Senha deve ter pelo menos 6 caracteres');
+      hasError = true;
+    } else if (passwordInput.value.length > 50) {
+      showError('password', 'Senha deve ter no máximo 50 caracteres');
       hasError = true;
     }
     
@@ -202,26 +220,51 @@ if (registerForm) {
     
     if (hasError) return;
     
-    // Simular registro (por enquanto)
+    // Registro via API
     setButtonLoading(submitButton, true);
     
     try {
-      // Aqui você faria a requisição ao backend
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Fazer requisição ao backend
+      const response = await ApiService.register(
+        usernameInput.value.trim(),
+        emailInput.value.trim(),
+        passwordInput.value
+      );
       
-      // Simular sucesso
-      console.log('✅ Cadastro realizado com sucesso!');
-      
-      // Salvar no localStorage (temporário)
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('username', usernameInput.value);
-      
-      // Redirecionar para o jogo
-      window.location.href = '/jogo';
+      if (response.data.success) {
+        console.log('✅ Cadastro realizado com sucesso!');
+        console.log('Usuário:', ApiService.getUser());
+        
+        // Redirecionar para o jogo
+        window.location.href = '/jogo';
+      } else {
+        // Mostrar mensagens de erro do backend
+        const errorMessage = response.data.message || 'Erro ao criar conta';
+        
+        // Se houver erros específicos de validação
+        if (response.data.errors && Array.isArray(response.data.errors)) {
+          // Mostrar primeiro erro em um campo relevante
+          const firstError = response.data.errors[0];
+          
+          if (firstError.includes('username') || firstError.includes('usuário')) {
+            showError('username', firstError);
+          } else if (firstError.includes('email')) {
+            showError('email', firstError);
+          } else if (firstError.includes('senha') || firstError.includes('password')) {
+            showError('password', firstError);
+          } else {
+            showError('email', errorMessage);
+          }
+        } else {
+          showError('email', errorMessage);
+        }
+        
+        setButtonLoading(submitButton, false);
+      }
       
     } catch (error) {
       console.error('❌ Erro no cadastro:', error);
-      showError('email', 'Este email já está em uso');
+      showError('email', 'Erro ao conectar com o servidor. Tente novamente.');
       setButtonLoading(submitButton, false);
     }
   });

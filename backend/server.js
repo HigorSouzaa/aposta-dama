@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const userRoute = require("./routes/userRoute")
 
 const app = express();
 const server = http.createServer(app);
@@ -894,6 +895,19 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/pages/register.html'));
 });
 
+// Rotas para páginas legais
+app.get('/termos', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/termos.html'));
+});
+
+app.get('/privacidade', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/privacidade.html'));
+});
+
+app.get('/jogo-responsavel', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/pages/jogo-responsavel.html'));
+});
+
 // Conexão MongoDB
 mongoose.connect('mongodb+srv://higorhenry102:Senac2004@api.1hr0gpv.mongodb.net/bcd_dama?retryWrites=true&w=majority&appName=API')
   .then(() => console.log('✅ MongoDB conectado com sucesso'))
@@ -1120,6 +1134,23 @@ io.on('connection', (socket) => {
     console.log('Jogador desconectado:', socket.id);
     handleDisconnect(socket.id);
   });
+  
+  // Chat
+  socket.on('chatMessage', (data) => {
+    const game = activeGames.get(data.roomId);
+    if (!game) return;
+    
+    // Usar o nome enviado pelo cliente (que já foi armazenado)
+    const playerName = data.playerName || 'Jogador';
+    
+    // Enviar mensagem para todos na sala exceto o remetente
+    socket.to(data.roomId).emit('chatMessage', {
+      playerName: playerName,
+      message: data.message
+    });
+    
+    console.log(`💬 Chat [${data.roomId}] ${playerName}: ${data.message}`);
+  });
 });
 
 function initializeGame(room) {
@@ -1132,6 +1163,10 @@ function initializeGame(room) {
     players: {
       white: room.host,
       black: room.isBot ? 'BOT' : room.guest
+    },
+    playerNames: {
+      white: room.hostName,
+      black: room.isBot ? 'BOT' : room.guestName
     },
     betAmount: room.betAmount,
     currentTurn: whoStarts,
@@ -1530,6 +1565,8 @@ function handleDisconnect(socketId) {
     }
   }
 }
+
+app.use("/api/users", userRoute)
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
